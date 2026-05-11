@@ -915,7 +915,7 @@ function renderCategoryView(catId) {
     <div class="view-header">
       <div class="view-title-wrap">
         <div class="view-title">${cat.name}</div>
-        <div class="view-subtitle">${totalActive} active${done.length ? ` · ${done.length} completed today` : ''}${isToday?' (carries over daily)':''}</div>
+        <div class="view-subtitle">${totalActive} active${done.length ? ` · ${done.length} completed today` : ''}</div>
       </div>
       <button class="add-btn" onclick="openAddTask('${catId}')">+ Add</button>
     </div>
