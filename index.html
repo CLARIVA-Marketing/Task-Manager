@@ -13,15 +13,7 @@
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────────────
@@ -42,8 +34,7 @@ try {
   const isConfigured = !Object.values(firebaseConfig).some(v => v.startsWith("PASTE_"));
   if (isConfigured) {
     app      = initializeApp(firebaseConfig);
-    auth    = getAuth(app);
-await setPersistence(auth, browserLocalPersistence);
+    auth     = getAuth(app);
     db       = getFirestore(app);
     provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
@@ -431,20 +422,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 </style>
 </head>
 <body>
-<div id="auth-loading"
-     style="
-       position:fixed;
-       inset:0;
-       background:var(--bg);
-       display:flex;
-       align-items:center;
-       justify-content:center;
-       z-index:99999;
-       font-size:1rem;
-       color:var(--text2);
-     ">
-  Loading TaskFlow...
-</div>
 <div id="app">
 
   <!-- ═══ LOGIN ═══ -->
@@ -668,22 +645,31 @@ function initUserSession() {
    APP SHOW/HIDE
 ═══════════════════════════════════════════════ */
 function showLogin() {
-  document.getElementById('auth-loading').style.display = 'none';
-
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('main-app').classList.add('hidden');
+  // Show Firebase notice if not configured
+  if (!window.__TF_FIREBASE_READY) document.getElementById('firebase-notice').style.display = 'block';
 }
 
 function showApp() {
-  document.getElementById('auth-loading').style.display = 'none';
-
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('main-app').classList.remove('hidden');
-
-  updateUserAvatar();
   renderAll();
   setupSwipe();
   setupOffline();
+  updateUserAvatar();
+}
+
+function updateUserAvatar() {
+  const wrap = document.getElementById('user-avatar-wrap');
+  if (!wrap) return;
+  const u = S.user;
+  if (u?.photo) {
+    wrap.innerHTML = `<img src="${u.photo}" class="user-avatar" alt="${u.name}">`;
+  } else {
+    const init = (u?.name||'U')[0].toUpperCase();
+    wrap.innerHTML = `<div class="user-initial">${init}</div>`;
+  }
 }
 
 /* ═══════════════════════════════════════════════
