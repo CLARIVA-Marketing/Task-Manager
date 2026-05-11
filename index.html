@@ -301,8 +301,14 @@ button{cursor:pointer;border:none;background:none}
 .act-btn.danger:hover{background:var(--critical-bg)}
 
 /* Drag handle shown on mobile via long press */
-.drag-handle{display:none;cursor:grab;color:var(--text3);padding:2px 4px;margin-top:1px}
-@media(pointer:coarse){.drag-handle{display:block}}
+.drag-handle{
+  display:block;
+  cursor:grab;
+  color:var(--text3);
+  padding:2px 6px;
+  margin-top:1px;
+  user-select:none;
+}
 
 /* ── COMPLETED SECTION ──────────────────────── */
 .done-section{margin-top:1.25rem}
@@ -964,7 +970,10 @@ function renderTaskCard(task, showCatBadge=false, isIdeas=false) {
     <div class="task-card urg-${task.urgency} ${task.completed?'done':''} ${overdue&&!task.completed?'overdue-card':''}"
       data-id="${task.id}" draggable="true" onclick="cardClick(event,'${task.id}')">
       <div class="task-top">
-        <div class="drag-handle" onclick="event.stopPropagation()" title="Hold to drag">⋮⋮</div>
+        <div class="drag-handle" 
+     onclick="event.stopPropagation()" 
+     onmousedown="event.stopPropagation()"
+     title="Drag to reorder">⋮⋮</div>
         <div class="task-check ${task.completed?'checked':''}" data-check="${task.id}" onclick="event.stopPropagation();toggleComplete('${task.id}')">
           <svg viewBox="0 0 11 11"><polyline points="1.5 5.5 4.5 8.5 9.5 2.5"/></svg>
         </div>
@@ -1162,10 +1171,11 @@ let dragId = null;
 function setupDragDrop() {
   document.querySelectorAll('.task-card[draggable]').forEach(card => {
     card.addEventListener('dragstart', e => {
-      dragId = card.dataset.id;
-      card.classList.add('dragging-row');
-      e.dataTransfer.effectAllowed = 'move';
-    });
+  dragId = card.dataset.id;
+  card.classList.add('dragging-row');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragId);
+});
     card.addEventListener('dragend', () => {
       card.classList.remove('dragging-row');
       document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('dragover-row'));
